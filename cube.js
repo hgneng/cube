@@ -25,6 +25,8 @@ var cube = (function() {
 		},//准备设置旋转之后的数据
 		cube = {};
 
+	cube.faces = faces;
+
 	function init() {
 		cubeWrapEle = document.getElementById('cubeWrap');
 		for (var type in faces) {
@@ -151,7 +153,7 @@ var cube = (function() {
 			}
 		}	
 
-		//将新的魔方数据设置魔方的函数
+		// 将新的魔方数据设置魔方的函数
 		function setData() {
 
 			for (var i = 0; i < 4; i++) {
@@ -161,14 +163,16 @@ var cube = (function() {
 			newSetFloorData.faceUp && faces[newSetFloorData.faceUp.faceType].setFaceData(newSetFloorData.faceUp.faceData);
 			newSetFloorData.faceBottom && faces[newSetFloorData.faceBottom.faceType].setFaceData(newSetFloorData.faceBottom.faceData);
 
-			//判断是否胜利
+			// 判断是否胜利
 			var success = true;
+			// 如果每一面Face里所有Block的type都一样，就表示每一面颜色都相同。
 			for (var faceType in faces) {
 				success = (success && faces[faceType].isAllSame());
 			}		
 			if (success) {successCallback();}	
-		}	
-		if (ani) {//需要动画
+		}
+
+		if (ani) { // 需要动画
 			floor.rotate(rotateType, floorNum, rotateFloorData, dir, durTime, function() {rotateFloorRotating = false;
 				setData();
 			});

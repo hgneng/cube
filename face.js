@@ -154,12 +154,12 @@ var Face = (function() {
 			}
 			//如果该下标已经有block实例。就reset 该block
 			for (var j = 0; j < cube_floor_num; j++) {
-
+				let value = 100 / cube_floor_num;
 				if (this.blocks[i][j]) {
-					this.blocks[i][j].reset(this.faceType, j, i, (100/cube_floor_num), (100/cube_floor_num), (100/cube_floor_num) * j, (100/cube_floor_num) * i);
+					this.blocks[i][j].reset(this.faceType, j, i, value, value, value * j, value * i);
 				} else {
 					//blocks里面放的都是Block实例，具体属性在block.js
-					this.blocks[i][j] = new Block(this.faceType, j, i, (100/cube_floor_num), (100/cube_floor_num), (100/cube_floor_num) * j, (100/cube_floor_num) * i);
+					this.blocks[i][j] = new Block(this.faceType, j, i, value, value, value * j, value * i);
 					//将blockEle添加到face;
 					this.faceEle.appendChild(this.blocks[i][j].blockEle);
 					var testDiv = document.createElement('div');
