@@ -278,6 +278,73 @@ var cube = (function() {
 		return cubeSize;
 	}
 
+	let typeCodes = {
+		'front': 0,
+		'right': 1,
+		'back': 2,
+		'left': 3,
+		'up': 4,
+		'bottom': 5
+	};
+
+	// 计算24种整体旋转态的状态值，取最小的一种作为特征状态值。
+	cube.computeUniqueStateCode = function() {
+		let stateCode = cube.computeStateCode();
+		let uniqueStateCode = stateCode;
+
+		let rotations = [
+			// 白前红右
+			['x', -1], // 蓝前红右
+			['x', -1], // 黄前红右
+			['x', -1], // 绿前红右
+			['y', -1], // 红前蓝右
+			['x', -1], // 白前蓝右
+			['x', -1], // 橙前蓝右
+			['x', -1], // 黄前蓝右
+			['y', -1], // 蓝前白右
+			['x', -1], // 红前白右
+			['x', -1], // 绿前白右
+			['x', -1], // 橙前白右
+			['y', -2], // 红前黄右
+			['x', -1], // 蓝前黄右
+			['x', -1], // 橙前黄右
+			['x', -1], // 绿前黄右
+			['z', -1], // 绿前橙右
+			['x', -1], // 黄前橙右
+			['x', -1], // 蓝前橙右
+			['x', -1], // 白前橙右
+			['z', 1],  // 白前绿右
+			['x', -1], // 红前绿右
+			['x', -1], // 黄前绿右
+			['x', -1], // 橙前绿右
+		];
+
+		for (let i = 0; i < 23; i++) {
+			cube.rotateAll(rotations[i][0], rotations[i][1]);
+			stateCode = cube.computeStateCode();
+			if (stateCode < uniqueStateCode) {
+				uniqueStateCode = stateCode;
+			}
+		}
+
+		return uniqueStateCode;
+	},
+
+	// 计算魔方当前状态值，返回值是一个整数数组，表示一个很大的整数。
+	cube.computeStateCode = function() {
+		let code = BigInt(0);
+		for (let type in faces) {
+			for (let i = 0; i < cube_floor_num; i++) {
+				for (let j = 0; j < cube_floor_num; j++) {
+					let blockCode = typeCodes[faces[type].blocks[i][j].type];
+					code = code * BigInt(6) + BigInt(blockCode);
+				}
+			}
+		}
+
+		return code;
+	}
+
 	init();
 	return cube;
 })();
@@ -401,7 +468,7 @@ var cubeHandler = (function(cube) {
 		cubeWrapEle.style.transform = 'rotateX(0deg) rotateY(0deg)';
 		cubeWrapEle.style.transition = '';
 	}
-
+	cube.stopRotateAnimate = stopRotateAnimate;
 
 	function startCube() {
 		//随机转魔方
