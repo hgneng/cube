@@ -278,6 +278,107 @@ var cube = (function() {
 		return cubeSize;
 	}
 
+	let solutionFound = false;
+
+	function isStateExist(code, stepIndex) {
+		return states[code];
+
+		for (let i = 0; i < stepIndex; i++) {
+			if (steps[0] === code) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// 转一下
+	function addSteps(stepIndex) {
+		let types = ['x', 'y', 'z'];
+		let dirs = [1, -1];
+		for (let type in types) {
+			for (let floorNum = 0; floorNum < cube_floor_num; floorNum++) {
+				for (let dir in dirs) {
+					cube.rotate(types[type], dirs[dir], floorNum, 0, false, function() {
+						solutionFound = true;
+						console.log('found in ' + stepIndex);
+					});
+
+					// 检查状态是否已经出现过
+					let code = cube.computeUniqueStateCode();
+					if (!isStateExist(code, stepIndex)) {
+						steps.push([code, types[type], dirs[dir], floorNum, stepIndex]);
+						states[code] = true;
+					}
+
+					// 恢复魔方
+					cube.rotate(types[type], -dirs[dir], floorNum, 0, false, null);
+				}
+			}
+		}
+	}
+
+	function setCube(stepIndex) {
+		let rotationSteps = [];
+		let i = stepIndex;
+		while (i > 0) {
+			rotationSteps.push(i);
+			i = steps[i][4];
+		}
+
+		for (let j = rotationSteps.length - 1; j >= 0; j--) {
+			let info = steps[rotationSteps[j]];
+			cube.rotate(info[1], info[2], info[3], 0, false, null);
+		}
+
+		$('step-depth').innerHTML = rotationSteps.length;
+		$('step-length').innerHTML = steps.length;
+		$('step-index').innerHTML = stepIndex;
+	}
+
+	function restoreCube(stepIndex) {
+		let i = stepIndex;
+
+		while (i > 0) {
+			let info = steps[i];
+			cube.rotate(info[1], -info[2], info[3], 0, false, null);
+			i = steps[i][4];
+		}
+	}
+
+	// 广度优先搜索找出最佳解
+	let steps; /// [状态码, type, dir, floorNum, 父节点下标]
+	let states = {};
+	let stepIndex;
+	cube.disableRendering = false;
+
+	function findNextStep() {
+		if (solutionFound || stepIndex >= steps.length) {
+			return;
+		}
+
+		let i = 0;
+		while (!solutionFound && stepIndex < steps.length && i < 1000) {
+			setCube(stepIndex);
+			addSteps(stepIndex);
+			stepIndex++;
+			restoreCube(stepIndex);
+			i++;
+		}
+		
+		setTimeout(findNextStep, 1);
+	}
+
+	cube.findBestSolution = function() {
+		// 初始化树根
+		solutionFound = false;
+		cube.disableRendering = true;
+		steps = [[cube.computeUniqueStateCode(), '', 0, 0, 0]];
+
+		stepIndex = 0;
+		findNextStep();
+	}
+
 	let typeCodes = {
 		'front': 0,
 		'right': 1,
@@ -471,9 +572,9 @@ var cubeHandler = (function(cube) {
 	cube.stopRotateAnimate = stopRotateAnimate;
 
 	function startCube() {
-		//随机转魔方
-		var randomRotateNum = cube_floor_num * 30,//随机转多少下
-			gapTime = 40,//两次随机转间隔时间
+		// 随机转魔方
+		var randomRotateNum = cube_floor_num * 30, // 随机转多少下
+			gapTime = 40, // 两次随机转间隔时间
 			rotateTypes = ['x','y','z'];
 
 		(function() {
@@ -486,7 +587,7 @@ var cubeHandler = (function(cube) {
 					dir = (Math.random() > 0.5 ? 1 : -1),
 					floorNum = parseInt(Math.random() * cube_floor_num);
 
-				cube.rotate(rotateType, dir, floorNum, 0, false);//随机转魔方不需要动画
+				cube.rotate(rotateType, dir, floorNum, 0, false); // 随机转魔方不需要动画
 				randomRotateNum--;
 				setTimeout(arguments.callee, gapTime);
 			}

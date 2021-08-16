@@ -24,7 +24,9 @@ var Block = (function() {
 	// Type of block, Type determine the color of block;
 	Block.prototype.setType = function(type) {
 		this.type = type;
-		this.blockEle.className = 'block block-' + type;
+		if (!cube.disableRendering) {
+			this.blockEle.className = 'block block-' + type;
+		}
 	}
 
 	Block.prototype.getType = function() {

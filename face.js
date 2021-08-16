@@ -38,10 +38,14 @@ var Face = (function() {
 		for (var i = 0; i < this.blocks.length; i++) {
 			if (colData) {
 				this.blocks[i][colNum].setType(colData[i]);
-				this.blocks[i][colNum].blockEle.style.opacity = '1';
+				if (!cube.disableRendering) {
+					this.blocks[i][colNum].blockEle.style.opacity = '1';
+				}
 			} else {
 				floorData.push(this.blocks[i][colNum].type);
-				this.blocks[i][colNum].blockEle.style.opacity = '0';
+				if (!cube.disableRendering) {
+					this.blocks[i][colNum].blockEle.style.opacity = '0';
+				}
 			}
 		}
 		return floorData;
@@ -53,10 +57,14 @@ var Face = (function() {
 		for (var i = 0; i < this.blocks[rowNum].length; i++) {
 			if (rowData) {
 				this.blocks[rowNum][i].setType(rowData[i]);
-				this.blocks[rowNum][i].blockEle.style.opacity = '1';
+				if (!cube.disableRendering) {
+					this.blocks[rowNum][i].blockEle.style.opacity = '1';
+				}
 			} else {
 				floorData.push(this.blocks[rowNum][i].type);
-				this.blocks[rowNum][i].blockEle.style.opacity = '0';
+				if (!cube.disableRendering) {
+					this.blocks[rowNum][i].blockEle.style.opacity = '0';
+				}
 			}
 		} 
 		return floorData;
@@ -107,7 +115,9 @@ var Face = (function() {
 			faceData[i] = [];
 			for (var j = 0; j < this.blocks[i].length; j++) {
 				faceData[i][j] = this.blocks[i][j].type;
-				this.blocks[i][j].blockEle.style.opacity = '0';
+				if (!cube.disableRendering) {
+					this.blocks[i][j].blockEle.style.opacity = '0';
+				}
 			}
 		}
 		return faceData;
@@ -118,7 +128,9 @@ var Face = (function() {
 		for (var i = 0; i < faceData.length; i++) {
 			for (var j = 0; j < faceData[i].length; j++) {
 				this.blocks[i][j].setType(faceData[i][j]);
-				this.blocks[i][j].blockEle.style.opacity = '1';
+				if (!cube.disableRendering) {
+					this.blocks[i][j].blockEle.style.opacity = '1';
+				}
 			}	
 		}		
 	}
